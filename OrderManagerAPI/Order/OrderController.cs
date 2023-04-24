@@ -45,6 +45,7 @@ public class OrderController : ControllerBase
     {
         var query = this.appDbContext.Orders as IQueryable<Order>;
 
+        query = userId == null ? query : query.Where(o => o.UserId == userId);
         query = FilterOrdersByDate(createdAt, cancelledAt, confirmedAt, shippedAt, completedAt, query);
         query = FilterByStatus(cancelled, confirmed, shipped, completed, query);
         query = includeBooks ? query.Include(o => o.Books) : query;
