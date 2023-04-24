@@ -87,7 +87,60 @@ public class Tests
         Assert.That(actualUserIds, Is.EquivalentTo(expectedUserIds));
     }
 
-    // TODO: GetAllOrdersReturnsOrdersWithBooksWhenBooksAreIncluded
+    [Test]
+    public async Task GetAllOrdersReturnsOrdersWithBooksWhenBooksAreIncluded()
+    {
+        var expectedOrders = new List<Order>
+        {
+            new Order
+            {
+                Id = 1,
+                UserId = 34,
+                Books = new List<Book>
+                {
+                    new Book
+                    {
+                        Id = 1,
+                        Amount = 33,
+                        ProductId = 1
+                    },
+                    new Book
+                    {
+                        Id = 2,
+                        Amount = 334,
+                        ProductId = 2
+                    },
+                }
+            },
+            new Order
+            {
+                Id = 2,
+                UserId = 45,
+                Books = new List<Book>
+                {
+                    new Book
+                    {
+                        Id = 3,
+                        Amount = 33343,
+                        ProductId = 123
+                    },
+                    new Book
+                    {
+                        Id = 4,
+                        Amount = 3343241,
+                        ProductId = 2321
+                    },
+                }
+            }
+        };
+        this.appDbContext.AddRange(expectedOrders);
+        await this.appDbContext.SaveChangesAsync();
+
+        var result = await this.orderController.GetAllOrders(null, null, null, null, null, null, null, null, null, null, true);
+        var actualOrders = (result.Result as OkObjectResult).Value as IEnumerable<GetOrderDto>;
+        var mappedExpectedOrders = this.mapper.Map<IEnumerable<GetOrderDto>>(expectedOrders);
+        Helper.AreEqualByJson(mappedExpectedOrders, actualOrders);
+    }
 
     // TODO: GetAllOrdersReturnsCancelledOrdersWhenCancelledOrdersFlagIsPassed
 
